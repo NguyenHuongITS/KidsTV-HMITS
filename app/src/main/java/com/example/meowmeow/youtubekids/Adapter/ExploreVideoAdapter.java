@@ -80,8 +80,6 @@ public class ExploreVideoAdapter extends RecyclerView.Adapter<ExploreVideoAdapte
                     return false;
                 }
             });
-
-
         }
     }
 }

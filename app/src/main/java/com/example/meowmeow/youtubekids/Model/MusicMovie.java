@@ -1,10 +1,15 @@
 package com.example.meowmeow.youtubekids.Model;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -25,18 +30,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
-public class MusicMovie extends YouTubeBaseActivity {
+public class MusicMovie extends YouTubeBaseActivity implements View.OnClickListener {
     ImageButton img_recommend,img_learning, img_shows, img_explore, img_search;
     CircularImageView img_user;
-
-    private String API_KEYPLAYLIST = "AIzaSyAI6YiDW8IaP6bVYSLTPyih2uNX0PWNyn0";
-    private String ID_PLAYLIST = "PLVOZ_45NZhu58nzy9VyRjsuEVlrIzgnqW";
-
     RecyclerView recyclerView;
     ArrayList<MusicVideo> arrayListMusic = new ArrayList<>();
     MusicVideoApdater musicVideoApdater;
+
+    private String API_KEYPLAYLIST = "AIzaSyAI6YiDW8IaP6bVYSLTPyih2uNX0PWNyn0";
+    private String ID_PLAYLIST = "PLVOZ_45NZhu58nzy9VyRjsuEVlrIzgnqW";
 
     // link lấy danh sách video từ playlist id
     public String urlYTB = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+ID_PLAYLIST+"&key="+API_KEYPLAYLIST;
@@ -46,53 +51,61 @@ public class MusicMovie extends YouTubeBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_movie);
 
+        //ánh xạ đến view để hiển thị
+        AnhXa();
+        //lấy dữ liệu từ youtube
+        GetYTBJson(urlYTB);
+        // sự kiện click của button
+        ControlButton();
+        //lấy dữ liệu từ sharepreferences
+        GetPreferences();
+    }
 
+    private void AnhXa() {
         img_user = findViewById(R.id.img_avatar);
         img_recommend = findViewById(R.id.img_recommend);
         img_learning = findViewById(R.id.img_learning);
         img_shows = findViewById(R.id.img_shows);
         img_explore = findViewById(R.id.img_explore);
         img_search = findViewById(R.id.img_search);
-
-        GetYTBJson(urlYTB);
         recyclerView = (RecyclerView) findViewById(R.id.recycleview_music);
+    }
 
+    private void ControlButton() {
+        img_explore.setOnClickListener(this);
+        img_learning.setOnClickListener(this);
+        img_recommend.setOnClickListener(this);
+        img_search.setOnClickListener(this);
+        img_shows.setOnClickListener(this);
+        img_user.setOnClickListener(this);
+    }
 
-        img_recommend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.img_recommend:
                 Intent intent = new Intent(MusicMovie.this, RecommendedMovie.class);
                 startActivity(intent);
-            }
-        });
-        img_learning.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MusicMovie.this,LearningMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_shows.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MusicMovie.this,ShowsMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_explore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MusicMovie.this, ExplorerMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_user.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MusicMovie.this, UserActivity.class);
-                startActivity(intent);
-            }
-        });
+                break;
+            case R.id.img_learning:
+                Intent intent2 = new Intent(MusicMovie.this,LearningMovie.class);
+                startActivity(intent2);
+                break;
+            case R.id.img_shows:
+                Intent intent3 = new Intent(MusicMovie.this,ShowsMovie.class);
+                startActivity(intent3);
+                break;
+            case R.id.img_explore:
+                Intent intent4 = new Intent(MusicMovie.this, ExplorerMovie.class);
+                startActivity(intent4);
+                break;
+            case R.id.img_avatar:
+                Intent intent5 = new Intent(MusicMovie.this, UserActivity.class);
+                startActivity(intent5);
+                break;
+            case R.id.img_search:
+                break;
+        }
     }
 
     private void GetYTBJson(final String url) {
@@ -140,4 +153,22 @@ public class MusicMovie extends YouTubeBaseActivity {
         });
         requestQueue.add(jsonObjectRequest);
     }
+
+    //lấy dữ liệu bằng sharepreferences
+    public void GetPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_name",MODE_PRIVATE);
+        String AvataValue = sharedPreferences.getString("avatar","");
+        if(!AvataValue.equals("")){
+            img_user.setImageBitmap(decodeBase64(AvataValue));
+        }
+    }
+
+    //hàm lấy hình ảnh thành bitmap
+    public static Bitmap decodeBase64(String input) {
+        byte[] decodedByte = Base64.decode(input, 0);
+        return BitmapFactory
+                .decodeByteArray(decodedByte, 0, decodedByte.length);
+    }
+
+
 }

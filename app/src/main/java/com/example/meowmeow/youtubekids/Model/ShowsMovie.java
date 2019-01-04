@@ -1,11 +1,18 @@
 package com.example.meowmeow.youtubekids.Model;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -27,20 +34,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
-public class ShowsMovie extends AppCompatActivity {
+public class ShowsMovie extends AppCompatActivity implements View.OnClickListener {
 
     ImageButton img_recommend,img_learning, img_explore, img_music, img_search;
-    CircularImageView img_user;
-
-    private String API_KEYPLAYLIST = "AIzaSyAI6YiDW8IaP6bVYSLTPyih2uNX0PWNyn0";
-    private String ID_PLAYLIST = "PLdhrcCVXurgIl9V2hWVdO-c9Rto3CoDZk";
-
+    CircularImageView img_useravt;
     RecyclerView recyclerView;
     ArrayList<ShowsVideo> showsVideoArrayList = new ArrayList<>();
     ShowsVideoAdapter showsVideoAdapter;
 
+    //Khai báo keyplaylist
+    private String API_KEYPLAYLIST = "AIzaSyAI6YiDW8IaP6bVYSLTPyih2uNX0PWNyn0";
+    //khai báo keyid
+    private String ID_PLAYLIST = "PLdhrcCVXurgIl9V2hWVdO-c9Rto3CoDZk";
     // link lấy danh sách video từ playlist id
     public String urlYTB = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId="+ID_PLAYLIST+"&key="+API_KEYPLAYLIST;
 
@@ -48,54 +56,93 @@ public class ShowsMovie extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shows_movie);
+        //ánh xạ đến view để hiển thị
+        AnhXa();
+        //lấy dữ liệu từ youtube
+        GetYTBJson(urlYTB);
+        //sự kiện click của button
+        ControlButton();
+        //lấy dữ liệu từ sharepreferences
+        GetPreferences();
+    }
 
-        img_user = findViewById(R.id.img_avatar);
+    private void AnhXa() {
+        img_useravt = findViewById(R.id.img_avatar);
         img_recommend = findViewById(R.id.img_recommend);
         img_learning = findViewById(R.id.img_learning);
         img_explore = findViewById(R.id.img_explore);
         img_music = findViewById(R.id.img_music);
         img_search = findViewById(R.id.img_search);
-
-        GetYTBJson(urlYTB);
         recyclerView = (RecyclerView) findViewById(R.id.recycleview_shows);
-
-        img_recommend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ShowsMovie.this, RecommendedMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_learning.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ShowsMovie.this,LearningMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_explore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ShowsMovie.this,ExplorerMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_music.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ShowsMovie.this,MusicMovie.class);
-                startActivity(intent);
-            }
-        });
-        img_user.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ShowsMovie.this, UserActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.img_explore:
+                Intent intent = new Intent(ShowsMovie.this, ExplorerMovie.class);
+                startActivity(intent);
+                break;
+            case R.id.img_learning:
+                Intent intent2 = new Intent(ShowsMovie.this,LearningMovie.class);
+                startActivity(intent2);
+                break;
+            case R.id.img_music:
+                Intent intent3 = new Intent(ShowsMovie.this, MusicMovie.class);
+                startActivity(intent3);
+                break;
+            case R.id.img_recommend:
+                Intent intent4 = new Intent(ShowsMovie.this, RecommendedMovie.class);
+                startActivity(intent4);
+                break;
+            case R.id.img_avatar:
+                Intent intent5 = new Intent(ShowsMovie.this, UserActivity.class);
+                startActivity(intent5);
+                break;
+            case R.id.img_search:
+                Intent intent6 = new Intent(ShowsMovie.this, UserActivity.class);
+                startActivity(intent6);
+                break;
+        }
+    }
+
+    private void ControlButton() {
+        img_useravt.setOnClickListener(this);
+        img_explore.setOnClickListener(this);
+        img_recommend.setOnClickListener(this);
+        img_learning.setOnClickListener(this);
+        img_music.setOnClickListener(this);
+        img_search.setOnClickListener(this);
+    }
+
+    //lấy dữ liệu bằng sharepreferences
+    public void GetPreferences(){
+        SharedPreferences sharedPreferences = getSharedPreferences("user_name",MODE_PRIVATE);
+        String AvataValue = sharedPreferences.getString("avatar","");
+        if(!AvataValue.equals("")){
+            img_useravt.setImageBitmap(decodeBase64(AvataValue));
+        }
+    }
+
+    //hàm chuyển hình ảnh thành bitmap
+    public static String encodeTobase64(Bitmap image) {
+        Bitmap immage = image;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        immage.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+        Log.d("Image Log:", imageEncoded);
+        return imageEncoded;
+    }
+
+    //hàm lấy hình ảnh thành bitmap
+    public static Bitmap decodeBase64(String input) {
+        byte[] decodedByte = Base64.decode(input, 0);
+        return BitmapFactory
+                .decodeByteArray(decodedByte, 0, decodedByte.length);
+    }
+
+    //Lấy dữ liệu từ youtube
     private void GetYTBJson(final String url) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -140,4 +187,5 @@ public class ShowsMovie extends AppCompatActivity {
         });
         requestQueue.add(jsonObjectRequest);
     }
+
 }

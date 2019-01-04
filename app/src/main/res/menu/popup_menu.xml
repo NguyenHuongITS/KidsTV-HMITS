@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/hengio"
-        android:title="Hẹn Giờ"/>
+        android:title="Hẹn Giờ" />
     <item
         android:id="@+id/phanhoi"
         android:title="Phản Hồi"/>

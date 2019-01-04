@@ -15,6 +15,8 @@ import com.example.meowmeow.youtubekids.R;
 public class TestActivity extends AppCompatActivity {
 
     private static final String TAG = "";
+    private static int value = Sensor.TYPE_PROXIMITY;
+    private static int valuetest = value*3;
 
 
     @Override
@@ -25,7 +27,7 @@ public class TestActivity extends AppCompatActivity {
         SensorManager sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
         final Sensor proximitySensor =
-                sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+                sensorManager.getDefaultSensor(valuetest);
         if(proximitySensor == null) {
             Log.e(TAG, "Proximity sensor not available.");
             finish(); // Close app

@@ -1,6 +1,8 @@
 package com.example.meowmeow.youtubekids.Model;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -29,7 +31,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.io.ByteArrayOutputStream;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends AppCompatActivity implements View.OnClickListener {
 
     //Khởi tạo các thành phần cần thiết cho ứng dụng
     Button btn_setting, btnBack, btnEdituser, btncancle, btnsettime, btnplus, btnminus, btnsatisfied, btnunsatisfied;
@@ -40,21 +42,18 @@ public class UserActivity extends AppCompatActivity {
     private SeekBar seekBar;
     public static int DELTA_VALUE = 1;
     private static final String LOGTAG = "Error";
+    public static int timecountdown = 0;
+    public static CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-
-        //lấy dữ liệu từ edit username
-//        Intent intent = getIntent();
-//        String result = intent.getStringExtra("user");
-
-        //gán dữ liệu lên textview
-        txt_username = findViewById(R.id.txt_Username);
-
+        //ánh xạ đến view để hiển thị
+        AnhXa();
+        //sự kiện click của button
+        ControlButton();
         //popup menu trong User
-        btn_setting = findViewById(R.id.btn_SettingUser);
         btn_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,7 +61,6 @@ public class UserActivity extends AppCompatActivity {
                 //Inflating the Popup using xml file
                 popup.getMenuInflater()
                         .inflate(R.menu.popup_menu, popup.getMenu());
-
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -82,46 +80,74 @@ public class UserActivity extends AppCompatActivity {
                 });
                 popup.show();
             }
-
-
-
         });
 
-        //quay lại trang chủ
+        //lấy dữ liệu từ sharepreferences
+        GetPreferences();
+    }
+
+    private void AnhXa() {
+        txt_username = findViewById(R.id.txt_Username);
+        imageuser = findViewById(R.id.img_User);
+        btnEdituser =findViewById(R.id.btn_EditUser);
         btnBack = findViewById(R.id.btn_BackUser);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btn_setting = findViewById(R.id.btn_SettingUser);
+    }
+
+    private void ControlButton() {
+        btnBack.setOnClickListener(this);
+        btnEdituser.setOnClickListener(this);
+        imageuser.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_SettingUser:
+                //popup menu trong User
+                PopupMenu popup = new PopupMenu(UserActivity.this, btn_setting);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater()
+                        .inflate(R.menu.popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.phanhoi:
+                                PhanHoiClick();
+                                return true;
+                            case R.id.gioithieu:
+                                GioiThieuClick();
+                                return true;
+                            case R.id.hengio:
+                                HenGioClick();
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
+                break;
+
+            case R.id.btn_BackUser:
                 Intent intent = new Intent(UserActivity.this, RecommendedMovie.class);
-                intent.putExtra("user",txt_username.getText().toString());
+                intent.putExtra("user", txt_username.getText().toString());
                 startActivity(intent);
                 finish();
-            }
-        });
+                break;
 
-        //Chỉnh sửa dữ liệu người dùng
-        btnEdituser =findViewById(R.id.btn_EditUser);
-        btnEdituser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            case R.id.btn_EditUser:
                 Intent intent1 = new Intent(UserActivity.this, EditUserActivity.class);
-                intent1.putExtra("user",txt_username.getText().toString());
+                intent1.putExtra("user", txt_username.getText().toString());
                 startActivity(intent1);
                 finish();
-            }
-        });
+                break;
 
-        //chọn account
-        imageuser = findViewById(R.id.img_User);
-        imageuser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            case R.id.img_User:
                 Intent intent2 = new Intent(UserActivity.this, RecommendedMovie.class);
                 startActivity(intent2);
-            }
-        });
-
-        GetPreferences();
+                break;
+        }
     }
 
     //Popup menu hẹn giờ
@@ -207,34 +233,53 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Đếm ngược thời gian tắt ứng dụng
+                //lấy thời gian tính bằng phút, sau đó chuyển qua giây
+                timecountdown = Integer.parseInt(txtplus.getText().toString()) * 60 *1000;
+                int hienthitime = timecountdown / 60000;
 
-                //lấy thời gian tính bằng phút
-                int time = Integer.parseInt(txtplus.getText().toString());
-                //chuyển qua giây
-                int timer = time*60*1000;
-
-                new CountDownTimer(timer, 1000) {
+                countDownTimer = new CountDownTimer(timecountdown, 1000) {
 
                     public void onTick(long millisUntilFinished) {
                         //Đếm ngược theo từng giây
-                        txttimer.setText("seconds remaining:" + millisUntilFinished / 1000);
+                        if(timecountdown == 0) {
+                            Toast.makeText(UserActivity.this, "Ứng dụng sẽ bị đóng!!!", Toast.LENGTH_SHORT).show();
+                            onBackPressed();
+                        }else {
+                            txttimer.setText("seconds remaining:" + millisUntilFinished / 1000);
+                        }
                     }
-
                     public void onFinish() {
-                        finish();//tắt ứng dụng
+                        showAlertDialog();
+                        //Toast.makeText(UserActivity.this, "Ứng dụng sẽ bị đóng!!!", Toast.LENGTH_SHORT).show();
+                        finishAndRemoveTask();//đóng toàn bộ ứng dụng
+                        //finishAffinity();
                     }
                 }.start();//bắt đầu đếm ngược
-
                 //Hiển thị thông báo cho người dùng
-                Toast.makeText(UserActivity.this, "Ứng dụng sẽ tự tắt trong: " + time + "" + "phút", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UserActivity.this, "Ứng dụng sẽ tự tắt trong: " + hienthitime + "phút", Toast.LENGTH_SHORT).show();
                 //dialog2.cancel();//đóng dialog
-                Intent intent = new Intent(UserActivity.this, RecommendedMovie.class);
-                startActivity(intent);
+                Intent intent3 = new Intent(UserActivity.this, RecommendedMovie.class);
+                startActivity(intent3);
             }
         });
 
         //Hiển thị dialog
         dialog2.show();
+    }
+
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Thông báo");
+        builder.setMessage("Hết giờ cài đặt sẵn");
+        builder.setCancelable(false);
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     //hàm tăng thời gian seekbar
@@ -310,7 +355,6 @@ public class UserActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("user_name",MODE_PRIVATE);
         String UserValue = sharedPreferences.getString("user","");
         String AvataValue = sharedPreferences.getString("avatar","");
-        //int uservalue = Integer.parseInt(sharedPreferences.getString("avatar",""));
         txt_username.setText(UserValue);
         if(!AvataValue.equals("")){
             imageuser.setImageBitmap(decodeBase64(AvataValue));
@@ -345,4 +389,5 @@ public class UserActivity extends AppCompatActivity {
         return BitmapFactory
                 .decodeByteArray(decodedByte, 0, decodedByte.length);
     }
+
 }
