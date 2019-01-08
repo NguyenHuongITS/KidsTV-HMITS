@@ -1,5 +1,6 @@
 package com.example.meowmeow.youtubekids.Model;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -9,24 +10,25 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
-
+import android.widget.Toast;
 import com.example.meowmeow.youtubekids.R;
 import com.github.siyamed.shapeimageview.CircularImageView;
 
+import java.lang.reflect.Method;
+
 public class RecommendedMovie extends AppCompatActivity implements View.OnClickListener {
-
-
     private static final String TAG = "";
-    private static final int valuesensor = Sensor.TYPE_PROXIMITY *3;
     ImageButton img_explore,img_learning, img_shows, img_music, img_search;
     CircularImageView img_user;
-
     //Khai báo keyplaylist
     // khai báo keyid
     // link lấy danh sách video từ playlist id
@@ -38,13 +40,12 @@ public class RecommendedMovie extends AppCompatActivity implements View.OnClickL
         //ánh xạ đến view để hiển thị
         AnhXa();
         //lấy dữ liệu từ youtube
-
         //sự kiện click của button
         ControlButton();
-        //Cảm biến để đo khoảng cách trong android
-        CamBienAndroid();
         //lấy dữ liệu từ sharepreferences
         GetPreferences();
+        //Cảm biến để đo khoảng cách trong android
+        SensorKidsTV();
     }
 
     private void AnhXa() {
@@ -93,30 +94,6 @@ public class RecommendedMovie extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    public void CamBienAndroid() {
-        final SensorManager sensorManager =
-                (SensorManager) getSystemService(SENSOR_SERVICE);
-        final Sensor proximitySensor =
-                sensorManager.getDefaultSensor(valuesensor);
-
-
-        final SensorEventListener sensorEventListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
-                // More code goes here
-                if(proximitySensor == null) {
-                    Log.e(TAG, "Proximity sensor not available.");
-                    finish(); // Close app
-                }
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
-            }
-        };
-        sensorManager.registerListener(sensorEventListener, proximitySensor, 2 * 1000 * 1000);
-    }
-
     //lấy dữ liệu bằng sharepreferences
     public void GetPreferences(){
         SharedPreferences sharedPreferences = getSharedPreferences("user_name",MODE_PRIVATE);
@@ -133,5 +110,44 @@ public class RecommendedMovie extends AppCompatActivity implements View.OnClickL
                 .decodeByteArray(decodedByte, 0, decodedByte.length);
     }
 
+    public void SensorKidsTV(){
+        SensorManager sensorManager =
+                (SensorManager) getSystemService(SENSOR_SERVICE);
+        final Sensor proximitySensor =
+                sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        if(proximitySensor == null) {
+            Log.e(TAG, "Proximity sensor not available.");
+            finish(); // Close app
+        }
+        // Create listener
+        SensorEventListener proximitySensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                // More code goes here
+                if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
+                    WindowManager.LayoutParams params = getWindow().getAttributes();
+                    params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    params.screenBrightness = 0.1f;
+                    getWindow().setAttributes(params);
+                    Toast.makeText(RecommendedMovie.this, "Khoảng cách quá gần. Vui lòng để ra xa", Toast.LENGTH_SHORT).show();
+                } else {
+                    WindowManager.LayoutParams params = getWindow().getAttributes();
+                    params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    params.screenBrightness = 0.9f;
+                    getWindow().setAttributes(params);
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+
+        // Register it, specifying the polling interval in
+        // microseconds
+        sensorManager.registerListener(proximitySensorListener,
+                proximitySensor, 2 * 1000 * 1000);
+    }
 
 }

@@ -2,12 +2,16 @@ package com.example.meowmeow.youtubekids.Model;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -31,10 +35,15 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.io.ByteArrayOutputStream;
 
+import angtrim.com.fivestarslibrary.FiveStarsDialog;
+import angtrim.com.fivestarslibrary.NegativeReviewListener;
+import angtrim.com.fivestarslibrary.ReviewListener;
+
 public class UserActivity extends AppCompatActivity implements View.OnClickListener {
 
     //Khởi tạo các thành phần cần thiết cho ứng dụng
     Button btn_setting, btnBack, btnEdituser, btncancle, btnsettime, btnplus, btnminus, btnsatisfied, btnunsatisfied;
+    Button btn_rateus, btn_rates, btn_feedbacks, btn_feedbackus;
     TextView txt_username, txtplus, txttimer;
     CircularImageView imageuser;
 
@@ -44,6 +53,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     private static final String LOGTAG = "Error";
     public static int timecountdown = 0;
     public static CountDownTimer countDownTimer;
+    public Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,12 +94,13 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
 
         //lấy dữ liệu từ sharepreferences
         GetPreferences();
+
     }
 
     private void AnhXa() {
         txt_username = findViewById(R.id.txt_Username);
         imageuser = findViewById(R.id.img_User);
-        btnEdituser =findViewById(R.id.btn_EditUser);
+        btnEdituser = findViewById(R.id.btn_EditUser);
         btnBack = findViewById(R.id.btn_BackUser);
         btn_setting = findViewById(R.id.btn_SettingUser);
     }
@@ -173,7 +184,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         txttimer = dialog2.findViewById(R.id.textView7);
 
 
-        txtplus.setText(""+seekBar.getProgress());
+        txtplus.setText("" + seekBar.getProgress());
 
         //thay đổi giá trị trong seekbar
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -185,6 +196,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 txtplus.setText("" + progress);
                 Log.i(LOGTAG, "Changing seekbar's progress");
             }
+
             // Khi người dùng bắt đầu cử chỉ kéo thanh gạt.
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -228,26 +240,27 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        btnsettime =dialog2.findViewById(R.id.btn_settime);
+        btnsettime = dialog2.findViewById(R.id.btn_settime);
         btnsettime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Đếm ngược thời gian tắt ứng dụng
                 //lấy thời gian tính bằng phút, sau đó chuyển qua giây
-                timecountdown = Integer.parseInt(txtplus.getText().toString()) * 60 *1000;
+                timecountdown = Integer.parseInt(txtplus.getText().toString()) * 60 * 1000;
                 int hienthitime = timecountdown / 60000;
 
                 countDownTimer = new CountDownTimer(timecountdown, 1000) {
 
                     public void onTick(long millisUntilFinished) {
                         //Đếm ngược theo từng giây
-                        if(timecountdown == 0) {
+                        if (timecountdown == 0) {
                             Toast.makeText(UserActivity.this, "Ứng dụng sẽ bị đóng!!!", Toast.LENGTH_SHORT).show();
                             onBackPressed();
-                        }else {
+                        } else {
                             txttimer.setText("seconds remaining:" + millisUntilFinished / 1000);
                         }
                     }
+
                     public void onFinish() {
                         showAlertDialog();
                         //Toast.makeText(UserActivity.this, "Ứng dụng sẽ bị đóng!!!", Toast.LENGTH_SHORT).show();
@@ -285,9 +298,9 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     //hàm tăng thời gian seekbar
     private void decreateProgress() {
         int progress = seekBar.getProgress();
-        if ((progress + DELTA_VALUE) > seekBar.getMax()){
+        if ((progress + DELTA_VALUE) > seekBar.getMax()) {
             seekBar.setProgress(0);
-        }else {
+        } else {
             seekBar.setProgress(progress + DELTA_VALUE);
         }
     }
@@ -295,16 +308,16 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     //hàm giảm thời gian seekbar
     private void increateProgress() {
         int progress = seekBar.getProgress();
-        if ((progress - DELTA_VALUE) < 0){
+        if ((progress - DELTA_VALUE) < 0) {
             seekBar.setProgress(0);
-        }else {
+        } else {
             seekBar.setProgress(progress - DELTA_VALUE);
         }
     }
 
     //Popup menu giới thiệu
     private void GioiThieuClick() {
-        Dialog dialog =new Dialog(this);
+        Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.item_introduce_settings);
         //Custom dialog
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
@@ -317,7 +330,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //Popup menu phản hồi
-    private void PhanHoiClick() {
+    public void PhanHoiClick() {
 
         final Dialog dialog1 = new Dialog(this);
         dialog1.setContentView(R.layout.item_feedback_settings);
@@ -336,38 +349,77 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 dialog1.setContentView(R.layout.item_feedback_satisfied);
+               // RateApp();
             }
         });
         //dialog1.setContentView(R.layout.khailong);
-        btnunsatisfied =dialog1.findViewById(R.id.feedback_unsatisfied);
+        btnunsatisfied = dialog1.findViewById(R.id.feedback_unsatisfied);
         btnunsatisfied.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog1.setContentView(R.layout.item_feedback_unsatisfied);
+              //  RateApp();
             }
         });
-
         dialog1.show();
     }
 
+//    //rateapp satisfied
+//    private void RateAppSatisfied() {
+//        btn_feedbacks = findViewById(R.id.btn_sendfeedbacks);
+//
+//        btn_rates = findViewById(R.id.btn_rateapps);
+//        btn_rates.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                RateApp();
+//            }
+//        });
+//    }
+
+//    //rateapp satisfied
+//    private void RateAppUnsatisfied() {
+//        final Dialog dialog4 = new Dialog(this);
+//        dialog4.setContentView(R.layout.item_feedback_unsatisfied);
+//        //Custom dialog
+//        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+//        layoutParams.copyFrom(dialog4.getWindow().getAttributes());
+//        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+//        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+//        layoutParams.gravity = Gravity.CENTER;
+//        dialog4.getWindow().setAttributes(layoutParams);
+//
+//        btn_feedbackus = findViewById(R.id.btn_sendfeedbackus);
+//
+//        btn_rateus = findViewById(R.id.btn_rateappus);
+//        btn_rateus.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                RateApp();
+//            }
+//        });
+//
+//        dialog4.show();
+//    }
+
     //lấy dữ liệu bằng sharepreferences
-    public void GetPreferences(){
-        SharedPreferences sharedPreferences = getSharedPreferences("user_name",MODE_PRIVATE);
-        String UserValue = sharedPreferences.getString("user","");
-        String AvataValue = sharedPreferences.getString("avatar","");
+    public void GetPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("user_name", MODE_PRIVATE);
+        String UserValue = sharedPreferences.getString("user", "");
+        String AvataValue = sharedPreferences.getString("avatar", "");
         txt_username.setText(UserValue);
-        if(!AvataValue.equals("")){
+        if (!AvataValue.equals("")) {
             imageuser.setImageBitmap(decodeBase64(AvataValue));
         }
     }
 
     ///lưu dữ liệu bằng sharepreferences
-    public void SavingPreferences(){
-        SharedPreferences sharedPreferences = getSharedPreferences("avatar_user",MODE_PRIVATE);
+    public void SavingPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("avatar_user", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        Bitmap bitmap =((BitmapDrawable) imageuser.getDrawable()).getBitmap();
-        editor.putString("avataruser",encodeTobase64(bitmap));
+        Bitmap bitmap = ((BitmapDrawable) imageuser.getDrawable()).getBitmap();
+        editor.putString("avataruser", encodeTobase64(bitmap));
 
         editor.commit();
     }
@@ -390,4 +442,30 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 .decodeByteArray(decodedByte, 0, decodedByte.length);
     }
 
+//    public void RateApp() {
+//        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"huong.cntp97@gmail.com");
+//        fiveStarsDialog.setRateText("Cho người khác biết cảm nhận của bạn")
+//                .setTitle("Xếp hạng ứng dụng này")
+//                .setForceMode(false)
+//                .setStyle(R.style.DialogTheme) // set theme from styles.xml
+//                .setUpperBound(2) // Market opened if a rating >= 2 is selected
+//                .setInternational()
+//                .setShowOnZeroStars(true) //open market on zero stars after positive button clicked
+//                .setNegativeReviewListener(this) // OVERRIDE mail intent for negative review
+//                .setReviewListener(this) // Used to listen for reviews (if you want to track them )
+//                .showAfter(0);
+////        Uri uri = Uri.parse("market://details?id=" + context.getPackageName());
+////        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+////        // To count with Play market backstack, After pressing back button,
+////        // to taken back to our application, we need to add following flags to intent.
+////        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+////                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+////                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+////        try {
+////            startActivity(goToMarket);
+////        } catch (ActivityNotFoundException e) {
+////            startActivity(new Intent(Intent.ACTION_VIEW,
+////                    Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
+////        }
+//    }
 }

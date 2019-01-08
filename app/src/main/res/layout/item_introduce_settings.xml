@@ -29,6 +29,6 @@
         android:layout_below="@+id/textView3"
         android:text="KidsTV là ứng dụng giúp cho các bé có thể xem hoạt hình, ca nhạc và đồng thời còn là nơi giúp các bé có thể học hỏi thêm nhiêu kiên thức. KidsTV có những tính năng đặc biệt như cho phụ huynh cài giờ để quản lý thời gian xem của bé tốt hơn, ngoài ra còn tính năng đặc biệt là có chọn lọc những video phù hợp với lứa tuổi của bé. "
         android:textColor="@android:color/background_dark"
-        android:textSize="24sp" />
+        android:textSize="26sp" />
 
 </RelativeLayout>

@@ -47,6 +47,8 @@ dependencies {
     //firebase
     implementation 'com.google.firebase:firebase-core:16.0.1'
     apply plugin: 'com.google.gms.google-services'
+
+    implementation 'com.github.mkaflowski:Android-Five-Stars-Dialog-Library:v3.4.2'
 }
 //apply plugin: 'com.google.gms.google-services'
 

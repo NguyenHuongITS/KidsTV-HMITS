@@ -16,18 +16,17 @@ public class TestActivity extends AppCompatActivity {
 
     private static final String TAG = "";
     private static int value = Sensor.TYPE_PROXIMITY;
-    private static int valuetest = value*3;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
+
         SensorManager sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
         final Sensor proximitySensor =
-                sensorManager.getDefaultSensor(valuetest);
+                sensorManager.getDefaultSensor(value);
         if(proximitySensor == null) {
             Log.e(TAG, "Proximity sensor not available.");
             finish(); // Close app

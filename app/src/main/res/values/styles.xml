@@ -9,6 +9,15 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
+
     </style>
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#db95fa</item>
+        <item name="colorPrimaryDark">#db95fa</item>
+        <item name="colorAccent">#db95fa</item>
+        <item name="android:textColor">#db95fa</item>
+
+    </style>
+
 
 </resources>
