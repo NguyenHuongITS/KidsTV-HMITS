@@ -16,6 +16,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
+    }
+    dataBinding {
+        enabled true
+    }
 }
 
 repositories {
@@ -50,8 +56,18 @@ dependencies {
     apply plugin: 'com.google.gms.google-services'
 
     implementation 'com.github.mkaflowski:Android-Five-Stars-Dialog-Library:v3.4.2'
+
+    implementation('com.google.apis:google-api-services-youtube:v3-rev206-1.25.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation('com.google.api-client:google-api-client:1.25.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    implementation 'com.squareup.retrofit2:retrofit:2.2.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
 }
 //apply plugin: 'com.google.gms.google-services'
 
 
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
