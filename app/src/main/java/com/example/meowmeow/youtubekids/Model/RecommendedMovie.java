@@ -10,14 +10,18 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import com.example.meowmeow.youtubekids.R;
@@ -27,11 +31,14 @@ import java.lang.reflect.Method;
 
 public class RecommendedMovie extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "";
-    ImageButton img_explore,img_learning, img_shows, img_music, img_search;
+    ImageButton img_explore,img_learning, img_shows, img_music, img_search, img_recommended;
     CircularImageView img_user;
+    Context context;
     //Khai báo keyplaylist
     // khai báo keyid
     // link lấy danh sách video từ playlist id
+
+    PowerManager.WakeLock mWakeLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +79,12 @@ public class RecommendedMovie extends AppCompatActivity implements View.OnClickL
             case R.id.img_avatar:
                 Intent intent = new Intent(RecommendedMovie.this, UserActivity.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.img_explore:
                 Intent intent2 = new Intent(RecommendedMovie.this, ExplorerMovie.class);
                 startActivity(intent2);
+                finish();
                 break;
             case R.id.img_music:
                 Intent intent3 = new Intent(RecommendedMovie.this,MusicMovie.class);
@@ -84,10 +93,12 @@ public class RecommendedMovie extends AppCompatActivity implements View.OnClickL
             case R.id.img_shows:
                 Intent intent4 = new Intent(RecommendedMovie.this,ShowsMovie.class);
                 startActivity(intent4);
+                finish();
                 break;
             case R.id.img_learning:
                 Intent intent5 = new Intent(RecommendedMovie.this,LearningMovie.class);
                 startActivity(intent5);
+                finish();
                 break;
             case R.id.img_search:
                 break;
@@ -121,15 +132,17 @@ public class RecommendedMovie extends AppCompatActivity implements View.OnClickL
         }
         // Create listener
         SensorEventListener proximitySensorListener = new SensorEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onSensorChanged(SensorEvent sensorEvent) {
                 // More code goes here
                 if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
                     WindowManager.LayoutParams params = getWindow().getAttributes();
-                    params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                    params.screenBrightness = 0.1f;
+                        params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    //params.screenBrightness = 0;
+                    params.getColorMode();
                     getWindow().setAttributes(params);
-                    Toast.makeText(RecommendedMovie.this, "Khoảng cách quá gần. Vui lòng để ra xa", Toast.LENGTH_SHORT).show();
+
                 } else {
                     WindowManager.LayoutParams params = getWindow().getAttributes();
                     params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;

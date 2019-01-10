@@ -82,26 +82,32 @@ public class ShowsMovie extends AppCompatActivity implements View.OnClickListene
             case R.id.img_explore:
                 Intent intent = new Intent(ShowsMovie.this, ExplorerMovie.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.img_learning:
                 Intent intent2 = new Intent(ShowsMovie.this,LearningMovie.class);
                 startActivity(intent2);
+                finish();
                 break;
             case R.id.img_music:
                 Intent intent3 = new Intent(ShowsMovie.this, MusicMovie.class);
                 startActivity(intent3);
+                finish();
                 break;
             case R.id.img_recommend:
                 Intent intent4 = new Intent(ShowsMovie.this, RecommendedMovie.class);
                 startActivity(intent4);
+                finish();
                 break;
             case R.id.img_avatar:
                 Intent intent5 = new Intent(ShowsMovie.this, UserActivity.class);
                 startActivity(intent5);
+                finish();
                 break;
             case R.id.img_search:
-                Intent intent6 = new Intent(ShowsMovie.this, UserActivity.class);
+                Intent intent6 = new Intent(ShowsMovie.this, SearchMovie.class);
                 startActivity(intent6);
+                finish();
                 break;
         }
     }

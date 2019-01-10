@@ -89,24 +89,30 @@ public class ExplorerMovie extends AppCompatActivity implements View.OnClickList
             case R.id.img_recommend:
                 Intent intent = new Intent(ExplorerMovie.this, RecommendedMovie.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.img_learning:
                 Intent intent1 = new Intent(ExplorerMovie.this, LearningMovie.class);
                 startActivity(intent1);
+                finish();
                 break;
             case R.id.img_shows:
                 Intent intent2 = new Intent(ExplorerMovie.this, ShowsMovie.class);
                 startActivity(intent2);
+                finish();
             case R.id.img_music:
                 Intent intent3 = new Intent(ExplorerMovie.this, MusicMovie.class);
                 startActivity(intent3);
+                finish();
                 break;
             case R.id.img_avatar:
                 Intent intent4 = new Intent(ExplorerMovie.this, UserActivity.class);
                 startActivity(intent4);
+                finish();
             case R.id.img_search:
                 Intent intent5 = new Intent(ExplorerMovie.this, SearchMovie.class);
                 startActivity(intent5);
+                finish();
                 break;
         }
     }

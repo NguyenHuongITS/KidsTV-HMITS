@@ -62,6 +62,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         tools:ignore="MissingConstraints"
+        android:background="#606184"
         tools:layout_editor_absoluteX="262dp"
         tools:layout_editor_absoluteY="282dp" />
 

@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.Rating;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -26,6 +27,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.PopupMenu;
+import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,11 +41,11 @@ import angtrim.com.fivestarslibrary.FiveStarsDialog;
 import angtrim.com.fivestarslibrary.NegativeReviewListener;
 import angtrim.com.fivestarslibrary.ReviewListener;
 
-public class UserActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserActivity extends AppCompatActivity implements View.OnClickListener, NegativeReviewListener, ReviewListener {
 
     //Khởi tạo các thành phần cần thiết cho ứng dụng
     Button btn_setting, btnBack, btnEdituser, btncancle, btnsettime, btnplus, btnminus, btnsatisfied, btnunsatisfied;
-    Button btn_rateus, btn_rates, btn_feedbacks, btn_feedbackus;
+    Button btn_sendfeedbackus, btn_sendfeedbacks;
     TextView txt_username, txtplus, txttimer;
     CircularImageView imageuser;
 
@@ -63,7 +65,7 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
         AnhXa();
         //sự kiện click của button
         ControlButton();
-        //popup menu trong User
+//        //popup menu trong User
         btn_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +82,9 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                                 return true;
                             case R.id.gioithieu:
                                 GioiThieuClick();
+                                return true;
+                            case R.id.danhgia:
+                                DanhGiaClick();
                                 return true;
                             case R.id.hengio:
                                 HenGioClick();
@@ -114,32 +119,6 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_SettingUser:
-                //popup menu trong User
-                PopupMenu popup = new PopupMenu(UserActivity.this, btn_setting);
-                //Inflating the Popup using xml file
-                popup.getMenuInflater()
-                        .inflate(R.menu.popup_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.phanhoi:
-                                PhanHoiClick();
-                                return true;
-                            case R.id.gioithieu:
-                                GioiThieuClick();
-                                return true;
-                            case R.id.hengio:
-                                HenGioClick();
-                                return true;
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
-                break;
-
             case R.id.btn_BackUser:
                 Intent intent = new Intent(UserActivity.this, RecommendedMovie.class);
                 intent.putExtra("user", txt_username.getText().toString());
@@ -159,6 +138,20 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent2);
                 break;
         }
+    }
+
+    private void DanhGiaClick() {
+        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"huong.cntp97@gmail.com");
+        fiveStarsDialog.setRateText("Cho người khác biết cảm nhận của bạn")
+                .setTitle("Xếp hạng ứng dụng này")
+                .setForceMode(false)
+                .setStyle(R.style.DialogTheme) // set theme from styles.xml
+                .setUpperBound(2) // Market opened if a rating >= 2 is selected
+                .setInternational()
+                .setShowOnZeroStars(true) //open market on zero stars after positive button clicked
+                .setNegativeReviewListener(this) // OVERRIDE mail intent for negative review
+                .setReviewListener(this) // Used to listen for reviews (if you want to track them )
+                .showAfter(0);
     }
 
     //Popup menu hẹn giờ
@@ -349,7 +342,14 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 dialog1.setContentView(R.layout.item_feedback_satisfied);
-               // RateApp();
+                btn_sendfeedbacks = dialog1.findViewById(R.id.btn_sendfeedbacks);
+                btn_sendfeedbacks.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SendmailFeedback();
+                        dialog1.cancel();
+                    }
+                });
             }
         });
         //dialog1.setContentView(R.layout.khailong);
@@ -358,49 +358,31 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View view) {
                 dialog1.setContentView(R.layout.item_feedback_unsatisfied);
-              //  RateApp();
+                btn_sendfeedbackus = dialog1.findViewById(R.id.btn_sendfeedbackus);
+                btn_sendfeedbackus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SendmailFeedback();
+                    }
+                });
+
             }
         });
         dialog1.show();
     }
 
-//    //rateapp satisfied
-//    private void RateAppSatisfied() {
-//        btn_feedbacks = findViewById(R.id.btn_sendfeedbacks);
-//
-//        btn_rates = findViewById(R.id.btn_rateapps);
-//        btn_rates.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                RateApp();
-//            }
-//        });
-//    }
+    private void SendmailFeedback() {
+        Intent mailIntent = new Intent(Intent.ACTION_VIEW);
+        Uri data = Uri.parse("mailto:?subject=" + "Phản hồi của bạn về ứng dụng KidsTV"+ "&body=" + "" + "&to=" + "huong.cntp97@gmail.com");
+        mailIntent.setData(data);
+        try {
+            startActivity(Intent.createChooser(mailIntent, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(UserActivity.this,
+                    "There is no email client installed.", Toast.LENGTH_SHORT).show();
+        }
 
-//    //rateapp satisfied
-//    private void RateAppUnsatisfied() {
-//        final Dialog dialog4 = new Dialog(this);
-//        dialog4.setContentView(R.layout.item_feedback_unsatisfied);
-//        //Custom dialog
-//        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-//        layoutParams.copyFrom(dialog4.getWindow().getAttributes());
-//        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-//        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//        layoutParams.gravity = Gravity.CENTER;
-//        dialog4.getWindow().setAttributes(layoutParams);
-//
-//        btn_feedbackus = findViewById(R.id.btn_sendfeedbackus);
-//
-//        btn_rateus = findViewById(R.id.btn_rateappus);
-//        btn_rateus.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                RateApp();
-//            }
-//        });
-//
-//        dialog4.show();
-//    }
+    }
 
     //lấy dữ liệu bằng sharepreferences
     public void GetPreferences() {
@@ -442,30 +424,13 @@ public class UserActivity extends AppCompatActivity implements View.OnClickListe
                 .decodeByteArray(decodedByte, 0, decodedByte.length);
     }
 
-//    public void RateApp() {
-//        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"huong.cntp97@gmail.com");
-//        fiveStarsDialog.setRateText("Cho người khác biết cảm nhận của bạn")
-//                .setTitle("Xếp hạng ứng dụng này")
-//                .setForceMode(false)
-//                .setStyle(R.style.DialogTheme) // set theme from styles.xml
-//                .setUpperBound(2) // Market opened if a rating >= 2 is selected
-//                .setInternational()
-//                .setShowOnZeroStars(true) //open market on zero stars after positive button clicked
-//                .setNegativeReviewListener(this) // OVERRIDE mail intent for negative review
-//                .setReviewListener(this) // Used to listen for reviews (if you want to track them )
-//                .showAfter(0);
-////        Uri uri = Uri.parse("market://details?id=" + context.getPackageName());
-////        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-////        // To count with Play market backstack, After pressing back button,
-////        // to taken back to our application, we need to add following flags to intent.
-////        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-////                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
-////                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-////        try {
-////            startActivity(goToMarket);
-////        } catch (ActivityNotFoundException e) {
-////            startActivity(new Intent(Intent.ACTION_VIEW,
-////                    Uri.parse("http://play.google.com/store/apps/details?id=" + context.getPackageName())));
-////        }
-//    }
+    @Override
+    public void onNegativeReview(int i) {
+
+    }
+
+    @Override
+    public void onReview(int i) {
+
+    }
 }

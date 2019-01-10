@@ -7,6 +7,9 @@
         android:id="@+id/phanhoi"
         android:title="Phản Hồi"/>
     <item
+        android:id="@+id/danhgia"
+        android:title="Đánh Giá" />
+    <item
         android:id="@+id/gioithieu"
         android:title="Giới Thiệu"/>
 </menu>

@@ -39,6 +39,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="150dp"
                 android:background="@drawable/icon_recommended"
+                android:stateListAnimator="@animator/anim_scale"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="150dp" />
 
@@ -50,6 +51,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="220dp"
                 android:background="@drawable/icon_hexplore"
+                android:stateListAnimator="@animator/anim_scale"
                 android:contentDescription="TODO"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="220dp" />
@@ -62,12 +64,14 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="290dp"
                 android:background="@drawable/icon_hlearning"
+                android:stateListAnimator="@animator/anim_scale"
                 android:contentDescription="TODO"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="290dp" />
 
             <ImageButton
                 android:background="@drawable/icon_hshows"
+                android:stateListAnimator="@animator/anim_scale"
                 android:id="@+id/img_shows"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
@@ -80,6 +84,7 @@
 
             <ImageButton
                 android:background="@drawable/icon_hmusic"
+                android:stateListAnimator="@animator/anim_scale"
                 android:id="@+id/img_music"
                 android:layout_width="45dp"
                 android:layout_height="45dp"

@@ -9,14 +9,14 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
-
     </style>
-    <style name="DialogTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">#db95fa</item>
-        <item name="colorPrimaryDark">#db95fa</item>
-        <item name="colorAccent">#db95fa</item>
-        <item name="android:textColor">#db95fa</item>
 
+    <style name="DialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">#003cff</item>
+        <item name="colorPrimaryDark">#9dff00</item>
+        <item name="colorAccent">#ff0004</item>
+        <item name="android:textColor">#ff0004</item>
+        <item name="android:windowBackground">@color/gray</item>
     </style>
 
 

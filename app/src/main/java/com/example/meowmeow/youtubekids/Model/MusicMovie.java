@@ -86,22 +86,27 @@ public class MusicMovie extends YouTubeBaseActivity implements View.OnClickListe
             case R.id.img_recommend:
                 Intent intent = new Intent(MusicMovie.this, RecommendedMovie.class);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.img_learning:
                 Intent intent2 = new Intent(MusicMovie.this,LearningMovie.class);
                 startActivity(intent2);
+                finish();
                 break;
             case R.id.img_shows:
                 Intent intent3 = new Intent(MusicMovie.this,ShowsMovie.class);
                 startActivity(intent3);
+                finish();
                 break;
             case R.id.img_explore:
                 Intent intent4 = new Intent(MusicMovie.this, ExplorerMovie.class);
                 startActivity(intent4);
+                finish();
                 break;
             case R.id.img_avatar:
                 Intent intent5 = new Intent(MusicMovie.this, UserActivity.class);
                 startActivity(intent5);
+                finish();
                 break;
             case R.id.img_search:
                 break;

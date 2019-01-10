@@ -25,7 +25,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="65dp"
-        android:text="Bạn muốn giới thiệu KidsTV với các gia đình khác trong Cửa hàng Play? Để xếp hạng chúng tôi, bạn cần rời khỏi ứng dụng KidsTV."
+        android:text="Cảm ơn bạn đã sử dụng KidsTV. Bạn muốn giới thiệu KidsTV với các gia đình khác trong Cửa hàng Play?"
         android:textColor="@color/black"
         android:textSize="22sp"
         android:textStyle="bold" />
@@ -34,29 +34,15 @@
         android:id="@+id/btn_sendfeedbacks"
         android:layout_width="163dp"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/btn_rateapps"
-        android:layout_below="@+id/btn_rateapps"
-        android:layout_marginTop="-129dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="143dp"
+        android:layout_marginEnd="69dp"
         android:alpha="0.8"
         android:background="#ffc526"
         android:text="GỬI PHẢN HỒI"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/btn_rateapps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="129dp"
-        android:layout_toEndOf="@+id/TextView10"
-        android:alpha="0.8"
-        android:background="#ffc526"
-        android:text="XẾP HẠNG ỨNG DỤNG TRÊN CỬA HÀNG PLAY"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
 
 </RelativeLayout>

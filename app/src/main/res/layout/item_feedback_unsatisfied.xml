@@ -12,25 +12,12 @@
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/textView9"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="92dp"
-        android:textStyle="bold"
-        android:background="#ffc526"
+        android:layout_marginBottom="132dp"
         android:alpha="0.8"
+        android:background="#ffc526"
         android:text="GỬI PHẢN HỒI"
-        android:textColor="@color/black" />
-
-    <Button
-        android:id="@+id/btn_rateappus"
-        android:layout_width="337dp"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/txt_SendFeedback"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="26dp"
-        android:textStyle="bold"
-        android:background="#ffc526"
-        android:alpha="0.8"
-        android:text="XẾP HẠNG ỨNG DỤNG TRÊN CỬA HÀNG PLAY"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textView8"
