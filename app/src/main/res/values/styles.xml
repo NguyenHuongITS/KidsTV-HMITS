@@ -15,8 +15,8 @@
         <item name="colorPrimary">#003cff</item>
         <item name="colorPrimaryDark">#9dff00</item>
         <item name="colorAccent">#ff0004</item>
-        <item name="android:textColor">#ff0004</item>
-        <item name="android:windowBackground">@color/gray</item>
+        <item name="android:textColor">#11ff00</item>
+        <item name="android:background">#72789b</item>
     </style>
 
 

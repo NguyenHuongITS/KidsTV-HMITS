@@ -4,6 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -38,7 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class LearningMovie extends AppCompatActivity implements View.OnClickListener {
-
+    private static final String TAG = "";
     ImageButton img_recommend,img_explore, img_shows, img_music, img_search;
     CircularImageView img_user;
 
@@ -64,6 +71,8 @@ public class LearningMovie extends AppCompatActivity implements View.OnClickList
         ControlButton();
         //lấy dữ liệu từ sharepreferences
         GetPreferences();
+        //Cảm biến để đo khoảng cách trong android
+        SensorKidsTV();
     }
 
     private void AnhXa() {
@@ -73,6 +82,7 @@ public class LearningMovie extends AppCompatActivity implements View.OnClickList
         img_explore = findViewById(R.id.img_explore);
         img_music = findViewById(R.id.img_music);
         img_search = findViewById(R.id.img_search);
+        recyclerView = (RecyclerView) findViewById(R.id.recycleview_learning);
     }
 
     @Override
@@ -110,6 +120,7 @@ public class LearningMovie extends AppCompatActivity implements View.OnClickList
                 break;
         }
     }
+
     private void ControlButton() {
         img_user.setOnClickListener(this);
         img_explore.setOnClickListener(this);
@@ -119,7 +130,6 @@ public class LearningMovie extends AppCompatActivity implements View.OnClickList
         img_search.setOnClickListener(this);
         recyclerView = (RecyclerView) findViewById(R.id.recycleview_learning);
     }
-
 
     private void GetYTBJson(final String url) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -166,7 +176,6 @@ public class LearningMovie extends AppCompatActivity implements View.OnClickList
         requestQueue.add(jsonObjectRequest);
     }
 
-
     //lấy dữ liệu bằng sharepreferences
     public void GetPreferences(){
         SharedPreferences sharedPreferences = getSharedPreferences("user_name",MODE_PRIVATE);
@@ -181,6 +190,48 @@ public class LearningMovie extends AppCompatActivity implements View.OnClickList
         byte[] decodedByte = Base64.decode(input, 0);
         return BitmapFactory
                 .decodeByteArray(decodedByte, 0, decodedByte.length);
+    }
+
+    public void SensorKidsTV(){
+        SensorManager sensorManager =
+                (SensorManager) getSystemService(SENSOR_SERVICE);
+        final Sensor proximitySensor =
+                sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        if(proximitySensor == null) {
+            Log.e(TAG, "Proximity sensor not available.");
+            finish(); // Close app
+        }
+        // Create listener
+        SensorEventListener proximitySensorListener = new SensorEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                // More code goes here
+                if(sensorEvent.values[0] < proximitySensor.getMaximumRange()) {
+                    WindowManager.LayoutParams params = getWindow().getAttributes();
+                    params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    params.screenBrightness = 0;
+                    params.getColorMode();
+                    getWindow().setAttributes(params);
+
+                } else {
+                    WindowManager.LayoutParams params = getWindow().getAttributes();
+                    params.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                    params.screenBrightness = 0.9f;
+                    getWindow().setAttributes(params);
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+
+        // Register it, specifying the polling interval in
+        // microseconds
+        sensorManager.registerListener(proximitySensorListener,
+                proximitySensor, 2 * 1000 * 1000);
     }
 
 }

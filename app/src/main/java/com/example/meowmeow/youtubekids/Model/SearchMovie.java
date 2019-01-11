@@ -1,6 +1,7 @@
 package com.example.meowmeow.youtubekids.Model;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,10 +41,12 @@ public class SearchMovie extends AppCompatActivity {
 
     ImageButton imageBack;
 
+    public Toolbar toolbar;
     private String API_KEYPLAYLIST = "AIzaSyAI6YiDW8IaP6bVYSLTPyih2uNX0PWNyn0";
-    private String ID_PLAYLIST = "PLVOZ_45NZhu58nzy9VyRjsuEVlrIzgnqW";
-    public String urlYTB = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=" + ID_PLAYLIST + "&key=" + API_KEYPLAYLIST;
-
+    //private String ID_PLAYLIST = "PLVOZ_45NZhu58nzy9VyRjsuEVlrIzgnqW";
+    //private String Base_URL = "https://www.googleapis.com/youtube/v3/";
+    public String searches = "";
+   // public String urlYTB = Base_URL + "search?part=snippet&q=soccer&type=playlist"+"&key=" + API_KEYPLAYLIST;
     private RecyclerView mRecyclerView;
     private ArrayList<SearchVideo> searchVideoList = new ArrayList<>();
     private SearchVideoAdapter searchVideoAdapter;
@@ -53,21 +57,28 @@ public class SearchMovie extends AppCompatActivity {
         setContentView(R.layout.activity_search_movie);
 
         imageBack = findViewById(R.id.img_back);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
         imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent =new Intent(SearchMovie.this,RecommendedMovie.class);
+                startActivity(intent);
                 finish();
             }
         });
 
-        GetYTBJson(urlYTB);
+       // searches = toolbar.getTitle().toString();
+//        GetYTBJson(query);
+
     }
 
-    private void GetYTBJson(final String url) {
+    private void GetYTBJson(String keyword) {
+
+        String url ="https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + keyword + "&maxResults=10&type=video&key="+API_KEYPLAYLIST;
+        Log.d("BBB",url);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new com.android.volley.Response.Listener<JSONObject>() {
@@ -80,13 +91,14 @@ public class SearchMovie extends AppCompatActivity {
                             String idvideo = "";
                             for (int i = 0; i < jsonItems.length(); i++) {
                                 JSONObject jsonObject = jsonItems.getJSONObject(i);
+                                JSONObject jsonId = jsonObject.getJSONObject("id");
                                 JSONObject jsonSnippet = jsonObject.getJSONObject("snippet");
                                 title = jsonSnippet.getString("title");
                                 JSONObject jsonThumbnails = jsonSnippet.getJSONObject("thumbnails");
                                 JSONObject jsonMedium = jsonThumbnails.getJSONObject("medium");
                                 urlvideo = jsonMedium.getString("url");
-                                JSONObject jsonResource = jsonSnippet.getJSONObject("resourceId");
-                                idvideo = jsonResource.getString("videoId");
+//                                JSONObject jsonResource = jsonId.getJSONObject("id");
+                                idvideo = jsonId.getString("videoId");
 
                                 searchVideoList.add(new SearchVideo(title, urlvideo, idvideo));
                             }
@@ -125,7 +137,7 @@ public class SearchMovie extends AppCompatActivity {
 //        getMenuInflater().inflate(R.menu.search_menu, menu);
         inflater.inflate(R.menu.search_menu,menu);
 
-        MenuItem search = menu.findItem(R.id.search);
+        final MenuItem search = menu.findItem(R.id.search);
 //        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         SearchView searchView = (SearchView) search.getActionView();
         searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -138,17 +150,22 @@ public class SearchMovie extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                GetYTBJson(urlYTB);
+                searches = query;
+                Log.d("BBB",searches);
+                GetYTBJson(query);
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchVideoAdapter.getFilter().filter(newText);
-                return false;
+                try{
+                    searchVideoAdapter.getFilter().filter(newText);
+                    return false;
+                }
+                catch (Exception ex){
+                    return  true;
+                }
             }
         });
         return true;
     }
-
 }

@@ -32,9 +32,9 @@ public class SearchVideo {
     String IdVideo;
 
     public SearchVideo(String title, String thumbnails, String idVideo) {
-        Title = title;
-        Thumbnails = thumbnails;
-        IdVideo = idVideo;
+        this.Title = title;
+        this.Thumbnails = thumbnails;
+        this.IdVideo = idVideo;
     }
 }
 

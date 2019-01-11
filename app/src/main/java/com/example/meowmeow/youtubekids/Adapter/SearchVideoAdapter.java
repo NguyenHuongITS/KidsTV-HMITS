@@ -19,8 +19,6 @@ import com.example.meowmeow.youtubekids.Interface.SearchVideo;
 import com.example.meowmeow.youtubekids.Model.PlayVideoYTB;
 import com.example.meowmeow.youtubekids.R;
 import com.squareup.picasso.Picasso;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +81,7 @@ public class SearchVideoAdapter extends RecyclerView.Adapter<SearchVideoAdapter.
     public void onBindViewHolder(SearchVideoAdapter.ViewHolder holder, int position) {
         SearchVideo searchVideo = searchVideoList.get(position);
         holder.txtTitle.setText(searchVideo.getTitle());
-        holder.Picasso.with(context).load(searchVideo.getThumbnails()).into(holder.imgThumbnails);
+        Picasso.with(context).load(searchVideo.getThumbnails()).into(holder.imgThumbnails);
     }
 
     @Override
